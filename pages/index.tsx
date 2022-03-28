@@ -16,7 +16,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
   const products = await getProducts();
   return {
     props: { products },
-    revalidate: 30, //시간을 지정해서 업데이트한다, 그러나 변경된 사항이 없어도 업데이트 한다는 단점이 있다
+    revalidate: parseInt(process.env.REVALIDATE_SECONDS), //시간을 지정해서 업데이트한다, 그러나 변경된 사항이 없어도 업데이트 한다는 단점이 있다
   };
 };
 
@@ -35,10 +35,9 @@ const HomePage: React.FC<HomePageProps> = ({ products }) => {
           <li key={product.id}>
             <Link href={`/products/${product.id}`}>
               <a>
-                 {product.title}
+                {product.title}
               </a>
-            </Link>
-           
+            </Link>           
           </li>
         ))}
       </ul>

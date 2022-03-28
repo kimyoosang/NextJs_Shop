@@ -1,9 +1,10 @@
-import { GetStaticPaths, GetStaticProps } from 'next'
-import Head from 'next/head'
-import React from 'react'
-import Title from '../../components/Title'
-import { getProducts, Product, getProduct } from '../../lib/product'
+import { GetStaticPaths, GetStaticProps } from 'next';
+import Head from 'next/head';
+import React from 'react';
+import Title from '../../components/Title';
+import { getProducts, Product, getProduct } from '../../lib/product';
 import { ParsedUrlQuery } from 'querystring';
+import { ApiError } from '../../lib/api';
 
 interface ProductPageParams extends ParsedUrlQuery {
   id: string;
@@ -14,39 +15,45 @@ interface ProductPageProps {
 }
 
 export const getStaticPaths: GetStaticPaths<ProductPageParams> = async () => {
-  const products = await getProducts()
+  const products = await getProducts();
   return {
     paths: products.map((product) => ({
-      params: {id: product.id.toString()},
+      params: { id: product.id.toString() },
     })),
-    fallback: 'blocking'
-  }
-}
+    fallback: 'blocking', //요청한 페이지가 존재하지 않을 경우 클라이언트 응답을 블로킹(차단)한 후, 새 데이터를 요청해서 받아온다 / false일 경우 404 페이지로 이동하게된다
+  };
+};
 
-export const getStaticProps: GetStaticProps<ProductPageProps, ProductPageParams> = async ({params:{id}}) => {
-  const product = await getProduct(id)
-  return {
-    props: {product},
+export const getStaticProps: GetStaticProps<
+  ProductPageProps,
+  ProductPageParams
+> = async ({ params: { id } }) => {
+  const product = await getProduct(id);
+  try {
+    return {
+      props: { product },
+      revalidate: parseInt(process.env.REVALIDATE_SECONDS),
+    };
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) {
+      return { notFound: true };
+    }
+    throw err;
   }
-}
+};
 
-const ProductPage: React.FC<ProductPageProps> = ({product}) => {
+const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
   return (
     <>
-    <Head>
-      <title>Next Shop</title>
-    </Head>
-      <main className='px-6 py-4'>
-        <Title>
-          {product.title}
-        </Title>
-        <p>
-          {[product.description]}
-        </p>
-    </main>
+      <Head>
+        <title>Next Shop</title>
+      </Head>
+      <main className="px-6 py-4">
+        <Title>{product.title}</Title>
+        <p>{[product.description]}</p>
+      </main>
     </>
-    
-  ) 
-}
+  );
+};
 
-export default ProductPage
+export default ProductPage;
