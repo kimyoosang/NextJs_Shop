@@ -20,7 +20,9 @@ export const getStaticPaths: GetStaticPaths<ProductPageParams> = async () => {
     paths: products.map((product) => ({
       params: { id: product.id.toString() },
     })),
-    fallback: 'blocking', //요청한 페이지가 존재하지 않을 경우 클라이언트 응답을 블로킹(차단)한 후, 새 데이터를 요청해서 받아온다 / false일 경우 404 페이지로 이동하게된다
+    fallback: 'blocking',
+    //요청한 페이지가 존재하지 않을 경우 클라이언트 응답을 블로킹(차단)한 후, 새 데이터를 요청해서 받아온다 / false일 경우 404 페이지로 이동하게된다
+    //만약 서버가 끊기면 원래 서버에러가 떠야하는데 블로킹을 하면 404페이지가 보이게 할 수 있다
   };
 };
 
@@ -36,6 +38,7 @@ export const getStaticProps: GetStaticProps<
     };
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) {
+      //404일때만 notFound 에러
       return { notFound: true };
     }
     throw err;

@@ -1,10 +1,11 @@
-import Head from "next/head";
-import Title from "../components/Title";
+import Head from 'next/head';
+import Title from '../components/Title';
 import { GetStaticProps } from 'next';
 //getSerberSideProps라는 것도 있는데 이는 새로고침 할대마다 서버사이드로 데이터를 업데이트한다
 //리로드하면 항상 새로운 데이터를 반영한다는 장점이 있지만, 페이지가 런타임에 생성되어 응답이 느려진다는 단점이 있다
 import { getProducts, Product } from '../lib/product';
-import Link from 'next/link'
+import Link from 'next/link';
+import ProductCard from '../components/ProductCard';
 
 interface HomePageProps {
   products: Product[];
@@ -21,7 +22,7 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
 };
 
 const HomePage: React.FC<HomePageProps> = ({ products }) => {
-  console.log('[HomePage] render: ', products)
+  console.log('[HomePage] render: ', products);
   return (
     <>
       <Head>
@@ -33,16 +34,12 @@ const HomePage: React.FC<HomePageProps> = ({ products }) => {
       <ul>
         {products.map((product) => (
           <li key={product.id}>
-            <Link href={`/products/${product.id}`}>
-              <a>
-                {product.title}
-              </a>
-            </Link>           
+            <ProductCard product={product} />
           </li>
         ))}
       </ul>
     </>
   );
-}
+};
 
 export default HomePage;
