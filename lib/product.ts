@@ -1,3 +1,5 @@
+import { fetchJson } from "./api";
+
 const { CMS_URL } = process.env;
 
 export interface Product {
@@ -6,6 +8,11 @@ export interface Product {
   description: string;
   price: string;
   pictureUrl: string;
+}
+
+export async function getProduct(id: string): Promise<Product> {
+  const product = await fetchJson(`http://localhost:1337/products/${id}`)
+  return stripProduct(product)
 }
 
 export async function getProducts(): Promise<Product[]> {
