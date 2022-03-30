@@ -39,3 +39,29 @@ export function useSignIn(): UseSignInResult {
     signInLoading: mutation.isLoading,
   };
 }
+export function useSignOut(): () => Promise<void> {
+  const queryClient = useQueryClient();
+  const mutation = useMutation(() => fetchJson('/api/logout'));
+  return async () => {
+    await mutation.mutateAsync();
+    queryClient.setQueryData(USER_QUERY_KEY, undefined);
+  };
+}
+
+export function useUser(): User {
+  const query = useQuery<User>(
+    USER_QUERY_KEY,
+    async () => {
+      try {
+        return await fetchJson('/api/user');
+      } catch (err) {
+        return undefined;
+      }
+    },
+    {
+      cacheTime: Infinity,
+      staleTime: 30_000, // ms
+    }
+  );
+  return query.data;
+}
