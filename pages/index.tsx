@@ -6,6 +6,7 @@ import { GetStaticProps } from 'next';
 import { getProducts, Product } from '../lib/product';
 import Link from 'next/link';
 import ProductCard from '../components/ProductCard';
+import Page from '../components/Page';
 
 interface HomePageProps {
   products: Product[];
@@ -24,21 +25,15 @@ export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
 const HomePage: React.FC<HomePageProps> = ({ products }) => {
   console.log('[HomePage] render: ', products);
   return (
-    <>
-      <Head>
-        <title>Next Shop</title>
-      </Head>
-      <main className="px-6 py-4">
-        <Title>Next Shop</Title>
-        <ul className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {products.map((product) => (
-            <li key={product.id}>
-              <ProductCard product={product} />
-            </li>
-          ))}
-        </ul>
-      </main>
-    </>
+    <Page title="Indoor Plants">
+      <ul className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {products.map((product) => (
+          <li key={product.id}>
+            <ProductCard product={product} />
+          </li>
+        ))}
+      </ul>
+    </Page>
   );
 };
 
