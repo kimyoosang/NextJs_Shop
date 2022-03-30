@@ -1,5 +1,8 @@
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { useMutation } from 'react-query';
+import { fetchJson } from '../lib/api';
+import Button from './Button';
 
 interface AddToCartWidgetProps {
   productId: number;
@@ -7,7 +10,18 @@ interface AddToCartWidgetProps {
 const AddToCartWidget: React.FC<AddToCartWidgetProps> = ({ productId }) => {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
+  const mutation = useMutation(() =>
+    fetchJson('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, quantity }),
+    })
+  );
 
+  const handleClick = async () => {
+    await mutation.mutateAsync();
+    router.push('/cart');
+  };
   return (
     <div className="py-2">
       <input
@@ -17,6 +31,11 @@ const AddToCartWidget: React.FC<AddToCartWidgetProps> = ({ productId }) => {
         value={quantity.toString()}
         onChange={(e) => setQuantity(parseInt(e.target.value))}
       />
+      {mutation.isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <Button onClick={handleClick}>Add to Cart</Button>
+      )}
     </div>
   );
 };
